@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'rest_framework',
     'rest_framework_simplejwt',
-    'users'
+    'users',
 ]
 
 REST_FRAMEWORK = {
@@ -138,7 +138,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+#Define User Model
+AUTH_USER_MODEL = "users.User"
 
 #JWT Settings
 SIMPLE_JWT = {
