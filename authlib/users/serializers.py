@@ -76,7 +76,7 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
             data = {
                 'subject':'Reset Your Password',
                 'body': f'Click on the link to reset your password {link}',
-                'to_email':user.email
+                'to_email': user.email
             }
             Util.send_email(data)
             return attrs
