@@ -19,6 +19,18 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+    
+    def create_vendor(self, email, name, tc, vendor_name, password=None):
+        user = self.create_user(
+            email=email,
+            name=name,
+            tc=tc,
+            password=password
+        )
+        user.is_vendor = True
+        user.vendor_name = vendor_name
+        user.save(using=self._db)
+        return user
 
     def create_superuser(self, email, name, tc, password=None):
         """
@@ -43,6 +55,14 @@ class User(AbstractBaseUser):
     )
     name = models.CharField(max_length=255)
     tc = models.BooleanField()
+
+    # Add new vendor-related fields
+    is_vendor = models.BooleanField(default=False)
+    vendor_name = models.CharField(max_length=255, blank=True, null=True)
+    vendor_description = models.TextField(blank=True, null=True)
+    vendor_address = models.CharField(max_length=500, blank=True, null=True)
+    vendor_phone = models.CharField(max_length=20, blank=True, null=True)
+
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -58,7 +78,11 @@ class User(AbstractBaseUser):
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
         # Simplest possible answer: Yes, always
-        return self.is_admin
+        if self.is_admin:
+            return True
+        if self.is_vendor and perm.startswith('vendor.'):
+            return True
+        return False
 
     def has_module_perms(self, app_label):
         "Does the user have permissions to view the app `app_label`?"
@@ -70,3 +94,11 @@ class User(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
+    
+    @property
+    def is_vendor_active(self):
+        return self.is_vendor and self.is_active
+    
+    @property 
+    def vendor_profile_complete(self):
+        return bool(self.vendor_name and self.vendor_description and self.vendor_address)

@@ -9,11 +9,18 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style = {
         'input_type':'password',
     },  write_only = True)
+    # class Meta:
+    #     model = User
+    #     fields = ['email', 'name', 'password', 'password2', 'tc']
+    #     extra_kwargs = {
+    #         'password':{'write_only': True}
+    #     }
+    
     class Meta:
         model = User
-        fields = ['email', 'name', 'password', 'password2', 'tc']
+        fields = ['email', 'name', 'tc', 'password', 'password2', 'is_vendor', 'vendor_name', 'vendor_description', 'vendor_address', 'vendor_phone']
         extra_kwargs = {
-            'password':{'write_only': True}
+            'password': {'write_only': True}
         }
 
     #validation
@@ -21,12 +28,16 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         password = attrs.get('password')
         password2 = attrs.get('password2')
         if password != password2:
-            raise serializers.ValidationError("Password and Confirm Password doesn't match")
+            raise serializers.ValidationError("Password and Confirm Password don't match")
         return attrs
     
     def create(self, validated_data):
-        validated_data.pop('password2', None)
+        validated_data.pop('password2')
+        if validated_data.get('is_vendor'):
+            return User.objects.create_vendor(**validated_data)
         return User.objects.create_user(**validated_data)
+
+
     
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -38,7 +49,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'name']
+        fields = ['id', 'email', 'name', 'is_vendor', 'vendor_name', 'vendor_description', 'vendor_address', 'vendor_phone']
 
 class UserChangePasswordSerializer(serializers.Serializer):
     password = serializers.CharField(max_length = 255, style = {'input_type':'password'}, write_only = True)
