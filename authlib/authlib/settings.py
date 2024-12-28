@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-xjp$ciwp9ayfu)hd7s!fmm=5f-__=pkp*jx4#60bjz*!p7tcg2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["nextauthlib.onrender.com"]
 
